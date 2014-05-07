@@ -1,0 +1,12 @@
+Accessing EEPROM data:
+Store address to access in EEADR (in BANK2)
+clear EECON1 bit #EEPGD to operate on EEPROM (in BANK3)
+set EECON1 bit #RD to read
+access data in EEDATA
+
+Writing:
+set EECON1 bit #EEWREN to enable writing
+Store address to write in EEADR (in BANK2)
+set EECON1 bit #WR to read
+
+
