@@ -1,11 +1,9 @@
     LIST	P=PIC16F877A
     include <p16F877A.inc>
-
+    include "constants.inc"
     __CONFIG _HS_OSC & _WDT_OFF & _PWRTE_ON & _CP_OFF & _LVP_OFF
 
-PC equ 0x110 ; Program counter (Bank2)
-INSTR1 equ 0x111 ; Memory location of MSB of instruction (Bank2)
-INSTR2 equ 0x112 ; Memory location of LSB of instruction (Bank2)
+
 
     ORG 0x00
     GOTO start
