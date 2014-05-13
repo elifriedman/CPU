@@ -17,6 +17,8 @@
     clrf    TRISC ; PORTC = input to ALU instruction select
     goto start
 
+
+
 readReg ; Read register, assuming non-offset reg address is in W already
     addlw   R0  ; offset to actual register locations
     movwf   FSR ; indirect addressing
@@ -69,14 +71,25 @@ execInstr ; Execute Instruction
     xorlw   NOP2    ; xoring will make W=0 and Z=1 if they match
     btfsc   STATUS,Z
     goto    inop2
-
-    xorlw   ADD^NOP2 ;
+    xorlw   ADD^NOP2 ; :::::: ADD
     btfsc   STATUS,Z
     goto    iadd
 
-    sublw   SUB^ADD ; If it didn't compare before, we want to undo the previous xor
+    xorlw   SUB^ADD  ; :::::: SUB
     btfsc   STATUS,Z
     goto    isub
+
+    xorlw   AND^SUB  ; :::::: AND
+    btfsc   STATUS,Z
+    goto    iand
+
+    xorlw   IOR^AND  ; :::::: OR
+    btfsc   STATUS,Z
+    goto    ior
+
+    xorlw   XOR^IOR  ; :::::: XOR
+    btfsc   STATUS,Z
+    goto    ixor
 
 inop2 ; NOP instruction
     goto start
@@ -119,28 +132,154 @@ iadd ; ADD instruction
     goto start
 
 isub ; SUB instruction
+ ; Write Rc to PORTB<7:4>
     movf    INSTR2,W
     andlw   0x0F ;
-    call readReg ; get Rc
-    movwf    Rc  ; store for later (!!!Actually need to write to IO Port for ALU)
+    call    readReg ; get Rc
+    banksel PORTB
+    movwf   PORTB
+    swapf   PORTB,F ; PORTB = cccc0000
 
+; Write Rb to PORTB<3:0>
+    banksel INSTR2
+    swapf   INSTR2,F
     movf    INSTR2,W
     andlw   0x0F
     call    readReg ; get Rb
-    subwf   writeVal ; Rb - Rc !!! use ALU
+    banksel PORTB
+    iorwf   PORTB,F ; PORTB = ccccbbbb
 
-    movf    INSTR1,W
-    andlw   0x0F ; get Ra
-
-    call    writeReg ; Ra = Ra + Rb
+; Get result from ALU
+    movlw   SUB
+    movwf   PORTC ; ALU Add
+    movf    PORTA,W
+; Write Z,C
     call    writeStatus
+
+; Write to Ra
+    banksel INSTR1
+    andlw   0x0F
+    movwf   writeVal
+    movf    INSTR1,W
+    andlw   0x0F ;
+
+    call    writeReg ; Ra = Rb + Rc
+
     goto start
+
+iand ; SUB instruction
+ ; Write Rc to PORTB<7:4>
+    movf    INSTR2,W
+    andlw   0x0F ;
+    call    readReg ; get Rc
+    banksel PORTB
+    movwf   PORTB
+    swapf   PORTB,F ; PORTB = cccc0000
+
+; Write Rb to PORTB<3:0>
+    banksel INSTR2
+    swapf   INSTR2,F
+    movf    INSTR2,W
+    andlw   0x0F
+    call    readReg ; get Rb
+    banksel PORTB
+    iorwf   PORTB,F ; PORTB = ccccbbbb
+
+; Get result from ALU
+    movlw   AND
+    movwf   PORTC ; ALU Add
+    movf    PORTA,W
+; Write Z,C
+    call    writeStatus
+
+; Write to Ra
+    banksel INSTR1
+    andlw   0x0F
+    movwf   writeVal
+    movf    INSTR1,W
+    andlw   0x0F ;
+
+    call    writeReg ; Ra = Rb + Rc
+
+    goto start
+
+ior ; SUB instruction
+ ; Write Rc to PORTB<7:4>
+    movf    INSTR2,W
+    andlw   0x0F ;
+    call    readReg ; get Rc
+    banksel PORTB
+    movwf   PORTB
+    swapf   PORTB,F ; PORTB = cccc0000
+
+; Write Rb to PORTB<3:0>
+    banksel INSTR2
+    swapf   INSTR2,F
+    movf    INSTR2,W
+    andlw   0x0F
+    call    readReg ; get Rb
+    banksel PORTB
+    iorwf   PORTB,F ; PORTB = ccccbbbb
+
+; Get result from ALU
+    movlw   IOR
+    movwf   PORTC ; ALU Add
+    movf    PORTA,W
+; Write Z,C
+    call    writeStatus
+
+; Write to Ra
+    banksel INSTR1
+    andlw   0x0F
+    movwf   writeVal
+    movf    INSTR1,W
+    andlw   0x0F ;
+
+    call    writeReg ; Ra = Rb + Rc
+
+    goto start
+
+ixor ; SUB instruction
+ ; Write Rc to PORTB<7:4>
+    movf    INSTR2,W
+    andlw   0x0F ;
+    call    readReg ; get Rc
+    banksel PORTB
+    movwf   PORTB
+    swapf   PORTB,F ; PORTB = cccc0000
+
+; Write Rb to PORTB<3:0>
+    banksel INSTR2
+    swapf   INSTR2,F
+    movf    INSTR2,W
+    andlw   0x0F
+    call    readReg ; get Rb
+    banksel PORTB
+    iorwf   PORTB,F ; PORTB = ccccbbbb
+
+; Get result from ALU
+    movlw   XOR
+    movwf   PORTC ; ALU Add
+    movf    PORTA,W
+; Write Z,C
+    call    writeStatus
+
+; Write to Ra
+    banksel INSTR1
+    andlw   0x0F
+    movwf   writeVal
+    movf    INSTR1,W
+    andlw   0x0F ;
+
+    call    writeReg ; Ra = Rb + Rc
+
+    goto start
+
+
+
 
 start
     call    readInstr;
     goto    execInstr;
     goto    start
     end
-
-
-

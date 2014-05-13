@@ -7,8 +7,8 @@ writeVal    equ 0x123
 Rc     equ 0x124
 
 ;---- Constants -----------------------------------------------------
-ZZ equ H'20'
-CC equ H'10'
+ZZ equ H'5'
+CC equ H'6'
 
 ;---- Instructions -----------------------------------------------------
 NOP2 equ B'00000000'; 0000 xxxx xxxx xxxx
