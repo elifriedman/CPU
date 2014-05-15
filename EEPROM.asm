@@ -189,7 +189,7 @@ iMOVk
     andlw 0x0F; extract kkkk
     movwf  writeVal; writeVal = 0000kkkk;
     movf INSTR1, W
-    andlw 0x0F; extra aaaa
+    andlw 0x0F; extract aaaa
     call writeReg    
     goto start
 
@@ -213,11 +213,58 @@ iSTO
 iSTOk
     goto start
 iTSC
+    movf    INSTR2, W
+    andlw   0x03; extract bb
+    movwf   t1; t1 = bb;
+    clrf    t2; t2 will be a mask
+    incf    t2; t2 = 0x01
+    btfsc   t1, 1; check b(1)
+    rlf     t2; bit shift left once
+    btfsc   t1, 1; check b(1)
+    rlf     t2; bit shift left second time
+    btfsc   t1, 0; check b(0)
+    rlf     t2; bit shift left second time
+    ;;t2 should be the right mask now.
+    
+    movf    INSTR1, W
+    andlw   0x0F; extract aaaa
+    call    readReg; w = *A
 
-    goto start
+    andwf   t2, w;
+    btfss   STATUS, Z;
+    goto    start; The bit was =1 so do nothing.//oposite for iTSS
+    ;;now make EEADD +=2;
+    incf    EEADR;
+    incf    EEADR;
+
+    goto    start
+
 iTSS
+    movf    INSTR2, W
+    andlw   0x03; extract bb
+    movwf   t1; t1 = bb;
+    clrf    t2; t2 will be a mask
+    incf    t2; t2 = 0x01
+    btfsc   t1, 1; check b(1)
+    rlf     t2; bit shift left once
+    btfsc   t1, 1; check b(1)
+    rlf     t2; bit shift left second time
+    btfsc   t1, 0; check b(0)
+    rlf     t2; bit shift left second time
+    ;;t2 should be the right mask now.
 
-    goto start
+    movf    INSTR1, W
+    andlw   0x0F; extract aaaa
+    call    readReg; w = *A
+
+    andwf   t2, w;
+    btfsc   STATUS, Z;
+    goto    start; The bit was =0 so do nothing.//oposite of iTSC
+    ;;now make EEADD +=2;
+    incf    EEADR;
+    incf    EEADR;
+
+    goto    start
 iJMP
     btfss INSTR1, 4 ; check which iJMP it is.
     goto iJMPk; it's k-type
