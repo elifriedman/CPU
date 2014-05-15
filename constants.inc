@@ -1,16 +1,16 @@
 
 ;----- Instruction Registers -----------------------------------------------------
 PC equ EEADR ; Program counter (Bank2)
-INSTR1 equ 0x121 ; Memory location of MSB of instruction (Bank2)
-INSTR2 equ 0x122 ; Memory location of LSB of instruction (Bank2)
-writeVal    equ 0x123
-ALUcmd     equ 0x124
+INSTR1 equ 0x110 ; Memory location of MSB of instruction (Bank2)
+INSTR2 equ 0x111 ; Memory location of LSB of instruction (Bank2)
+writeVal   equ 0x112
+ALUcmd     equ 0x113
+sPtr       equ 0x114
 
-t0  equ 0x130
-t1  equ 0x131
-t2  equ 0x132
-t3  equ 0x133
-t4  equ 0x134
+t0  equ 0x115
+t1  equ 0x116
+t2  equ 0x117
+t3  equ 0x118
 
 ;---- Constants -----------------------------------------------------
 ZZ equ H'5'

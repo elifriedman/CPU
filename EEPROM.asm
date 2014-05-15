@@ -17,6 +17,9 @@
     movwf   TRISA ; PORTA = result from ALU and Z and C
     clrf    TRISB ; PORTB = input to ALU aaaa bbbb
     clrf    TRISC ; PORTC = input to ALU instruction select
+    movlw   0x1F
+    movwf   sPtr; Set stack pointer to -1 of the top of stack;
+
     goto start
 
 
@@ -83,13 +86,9 @@ execInstr ; Execute Instruction
 
     xorlw TSC^STO 
     btfsc STATUS,Z
-    goto iTSC
+    goto iTSC ;; this will also handle TSS
 
-    xorlw TSS^TSC
-    btfsc STATUS,Z
-    goto iTSS
-
-    xorlw JMP^TSS
+    xorlw JMP^TSC
     btfsc STATUS,Z
     goto iJMP
 
@@ -169,7 +168,7 @@ iALU ; ALU instruction
     
     goto start
 
-;;Make functions -iMOV - RET
+;;moving/jumping etc. commands
 iMOV
     btfss INSTR2, 7 ; check which iMOV it is. 
     goto iMOVk; it's k-type
@@ -213,6 +212,9 @@ iSTO
 iSTOk
     goto start
 iTSC
+    btfsc INSTR2, 7 ; check if TSC or TSS
+    goto iTSS; it's TSS
+
     movf    INSTR2, W
     andlw   0x03; extract bb
     movwf   t1; t1 = bb;
@@ -266,18 +268,67 @@ iTSS
 
     goto    start
 iJMP
-    btfss INSTR1, 4 ; check which iJMP it is.
-    goto iJMPk; it's k-type
-
-    goto start
+    btfss   INSTR1, 4 ; check which iJMP it is.
+    goto    iJMPk; it's k-type
+    ;;else it's a-type JMP
+    movf    INSTR2, W
+    andlw   0x0F; extract aaaa
+    call    readReg; w = *A
+    movwf   t2; t2 = [0x0 *A ] ;
+    swapf   t2; t2 = [*A  0x0] ;
+    addlw   1;
+    call    readReg; w = *(A+1)
+    addwf   t2, W; W = [*A *(A+1)];
+    movwf   EEADR; EEADR = [*A *(A+1)];
+    rlf     EEADR; b/c commmands are 2 bytes.
+    goto    start
 
 iJMPk
-
+    movf   INSTR2; w = K;
+    movwf   EEADR; = K;
+    rlf     EEADR; b/c commmands are 2 bytes.
     goto start
 iJSR
+    incf    sPtr;
+    incf    EEADR;
+    incf    EEADR; now EEADR is on the next item for when the function call is done.
+    movfw   sPtr;
+    movwf   FSR; the location should be at *sPtr
+    movfw   EEADR; fill it's with EEADR
+    movwf   INDF; (*sPTR) = EEADR;
+
+    btfss INSTR1, 4 ; check which iJSR it is.
+    goto iJSRk; it's k-type
+    ;else it's a a-type JSR
+
+    movf    INSTR2, W
+    andlw   0x0F; extract aaaa
+    call    readReg; w = *A
+    movwf   t2; t2 = [0x0 *A ] ;
+    swapf   t2; t2 = [*A  0x0] ;
+    addlw   1;
+    call    readReg; w = *(A+1)
+    addwf   t2, W; W = [*A *(A+1)];
+    movwf   EEADR; EEADR = [*A *(A+1)];
+    rlf     EEADR; b/c commmands are 2 bytes.
+
 
     goto start
+
+iJSRk
+    ;;the stackp movements happened in JSR
+    movfw   INSTR2; w = K;
+    movwf   EEADR;  EEADR = K;
+    rlf     EEADR;  EEADR = K<<1;
+  
+    goto    start;
 iRET
+   
+   movfw   sPtr;
+   movwf   FSR ; indirect addressing
+   movf    INDF,W;
+   movwf   EEADR;
+   decf    sPtr;
 
     goto start
 
