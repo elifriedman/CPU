@@ -28,7 +28,7 @@ readRAM ; Read RAM, assuming non-offset RAM address is in W already
     movwf   FSR;
     movf    INDF,W;
     return
-writeMem
+writeRAM
     banksel RAM
     addlw   RAM ; and value to write is in writeVal
     movwf   FSR
@@ -238,12 +238,36 @@ iLODk
     call    writeReg
     goto    start
 iSTO
-    btfss INSTR2, 7 ; check which iSTO it is.
-    goto iSTOk; it's k-type
+    btfss   INSTR2, 7 ; check which iSTO it is.
+    goto    iSTOk; it's k-type
+
+    movf    INSTR2,W ; extract Rb
+    andlw   0x0F
+    call    readReg
+    movwf   writeVal
+    
+    movf    INSTR1,W ; extract Ra
+    andlw   0x0F    
+    movwf   INSTR1  ; We'll need Ra+1
+    call    readReg ; we need to get [Ra(3:1) Ra+1]
+    movwf   t0
+    swapf   t0,F;
+    incf    INSTR1,W ; move to next register
+    call    readReg ; get Ra+1
+    iorwf   t0,W;
+    andlw   0x7F    ; we now have [Ra(3:1) Ra+1] in W
+    call    writeRAM
 
     goto start
 
 iSTOk
+    movf    INSTR1,W ; load Ra to W
+    andlw   0x0f
+    call    readReg
+    movwf   writeVal
+    movf    INSTR2,W
+    andlw   0x7F ; extract 0b0kkk kkkk
+    call    writeRAM
     goto start
 iTSC
     btfsc INSTR2, 7 ; check if TSC or TSS
