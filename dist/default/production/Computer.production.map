@@ -1,0 +1,56 @@
+MPLINK 5.01, LINKER
+Linker Map File - Created Tue May 13 19:47:19 2014
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x0001a8
+                   .cinit    romdata   0x0000d4    program   0x000004
+.config_2007_BUILD/DEFAULT/PRODUCTION/EEPROM.       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x0000d5      
+                            0x002007    0x002007      
+            215 out of 8454 program addresses used, program memory utilization is 2%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                execInstr   0x000030    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                     iadd   0x000045    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                     iand   0x00007d    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                    inop2   0x000044    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                      ior   0x000099    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                     isub   0x000061    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                     ixor   0x0000b5    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                readInstr   0x00001b    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                  readReg   0x00000c    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                    start   0x0000d1    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                 writeReg   0x000010    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+              writeStatus   0x000015    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                  readReg   0x00000c    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                 writeReg   0x000010    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+              writeStatus   0x000015    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                readInstr   0x00001b    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                execInstr   0x000030    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                    inop2   0x000044    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                     iadd   0x000045    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                     isub   0x000061    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                     iand   0x00007d    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                      ior   0x000099    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                     ixor   0x0000b5    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+                    start   0x0000d1    program     static /Users/EliFriedman/Documents/School/Sophomore/CompArch/Computer/EEPROM.asm
+
+

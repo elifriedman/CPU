@@ -1,0 +1,957 @@
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001     LIST        P=PIC16F877A
+                      00002     include <p16F877A.inc>
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ;  MPASM PIC16F877A processor include
+                      00005 ; 
+                      00006 ;  (c) Copyright 1999-2014 Microchip Technology, All rights reserved
+                      00007 ;==========================================================================
+                      00008 
+                      00566         LIST
+                      00003     include "constants.inc"
+                      00001 
+                      00002 ;----- Instruction Registers -----------------------------------------------------
+  00000120            00003 PC equ 0x120 ; Program counter (Bank2)
+  00000121            00004 INSTR1 equ 0x121 ; Memory location of MSB of instruction (Bank2)
+  00000122            00005 INSTR2 equ 0x122 ; Memory location of LSB of instruction (Bank2)
+  00000123            00006 writeVal    equ 0x123
+  00000124            00007 Rc     equ 0x124
+                      00008 
+                      00009 ;---- Constants -----------------------------------------------------
+  00000005            00010 ZZ equ H'5'
+  00000006            00011 CC equ H'6'
+                      00012 
+                      00013 ;---- Instructions -----------------------------------------------------
+  00000000            00014 NOP2 equ B'00000000'; 0000 xxxx xxxx xxxx
+  00000010            00015 ADD equ B'00010000' ; 0001 aaaa bbbb cccc    Z,C     Ra = Rb + Rc
+  00000020            00016 SUB equ B'00100000' ; 0010 aaaa bbbb cccc    Z,C     Ra = Rb ­ Rc
+  00000030            00017 AND equ B'00110000' ; 0011 aaaa bbbb cccc    Z,C     Ra = Rb & Rc
+  00000040            00018 IOR equ B'01000000' ; 0100 aaaa bbbb cccc    Z,C     Ra = Rb | Rc
+  00000050            00019 XOR equ B'01010000' ; 0101 aaaa bbbb cccc    Z,C     Ra = Rb ^ Rc
+  00000060            00020 RRL equ B'01100000' ; 0110 aaaa 0xxx bbbb    C       Ra = Rb rotated left by 1 thru C
+  00000060            00021 RRR equ B'01100000' ; 0110 aaaa 1xxx bbbb    C       Ra = Rb rotated right by 1 thru C
+  00000070            00022 NOT equ B'01110000' ; 0111 aaaa xxxx bbbb    Z       Ra = ~Rb
+  00000080            00023 MOV equ B'10000000' ; 1000 aaaa 1xxx bbbb    Z       Ra = Rb
+  00000080            00024 MOV equ B'10000000' ; 1000 aaaa 0xxx kkkk    Z       Ra = k
+  00000090            00025 LOD equ B'10010000' ; 1001 aaaa 0kkk kkkk    Z       Ra = [k]
+  00000090            00026 LOD equ B'10010000' ; 1001 aaaa 1xxx bbbb    Z       Ra = [Rb(3:1) Rb+1]
+  000000A0            00027 STO equ B'10100000' ; 1010 aaaa 0kkk kkkk    Z       [k] = Ra
+  000000A0            00028 STO equ B'10100000' ; 1010 aaaa 1xxx bbbb    Z       [Ra(3:1) Ra+1] = Rb
+  000000B0            00029 TSC equ B'10110000' ; 1011 aaaa 0xxx xxbb    -       if Ra(b) = 0, PC=PC+2
+  000000B0            00030 TSS equ B'10110000' ; 1011 aaaa 1xxx xxbb    -       if Ra(b) = 1, PC=PC+2
+  000000C0            00031 JMP equ B'11000000' ; 1100 0kkk kkkk kkkk    -       PC=k<<1 // since instructions are two bytes
+  000000C0            00032 JMP equ B'11000000' ; 1100 1xxx xxxx aaaa    -       PC=[Ra(3:1) Ra+1]<<1
+  000000D0            00033 JSR equ B'11010000' ; 1101 0kkk kkkk kkkk    -       PC+2->STACK_TOP; PC=k<<1
+  000000D0            00034 JSR equ B'11010000' ; 1101 1xxx xxxx aaaa    -       PC+2->STACK_TOP; PC=[Ra(3:1) Ra+1]<<1
+  000000E0            00035 RET equ B'11100000' ; 1110 xxxx xxxx xxxx    -       PC <- STACK_TOP
+                      00036 
+                      00037 
+                      00038 
+                      00039 
+                      00040 
+                      00041 ;----- Register Files -----------------------------------------------------
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+  00000070            00042 R0 equ 0x70
+  00000071            00043 R1 equ 0x71
+  00000072            00044 R2 equ 0x72
+  00000073            00045 R3 equ 0x73
+  00000074            00046 R4 equ 0x74
+  00000075            00047 R5 equ 0x75
+  00000076            00048 R6 equ 0x76
+  00000077            00049 R7 equ 0x77
+  00000078            00050 R8 equ 0x78
+  00000079            00051 R9 equ 0x79
+  0000007A            00052 R10 equ 0x7A
+  0000007B            00053 R11 equ 0x7B
+  0000007C            00054 R12 equ 0x7C
+  0000007D            00055 R13 equ 0x7D
+  0000007E            00056 R14 equ 0x7E ; BANK SELECT register
+  0000007F            00057 R15 equ 0x7F ; STATUS register [- - Z C] (bank0)
+2007   3F72           00004     __CONFIG _HS_OSC & _WDT_OFF & _PWRTE_ON & _CP_OFF & _LVP_OFF
+                      00005 
+                      00006 
+                      00007 
+                      00008     ORG 0x00
+0000   1283 1703      00009     banksel PC
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0002   01A0           00010     clrf    PC
+0003   1683 1303      00011     banksel ADCON1 ; set PORTA as input
+0005   3006           00012     movlw   0x06
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0006   009F           00013     movwf   ADCON1
+0007   30FF           00014     movlw   0xFF
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0008   0085           00015     movwf   TRISA ; PORTA = result from ALU and Z and C
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0009   0186           00016     clrf    TRISB ; PORTB = input to ALU aaaa bbbb
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+000A   0187           00017     clrf    TRISC ; PORTC = input to ALU instruction select
+000B   1683 1703      00018     banksel EECON1
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+000D   138C           00019     bcf     EECON1,EEPGD ; ready to read from EEPROM;
+                      00020 
+000E   2???           00021     goto start
+                      00022 
+                      00023 
+                      00024 
+000F                  00025 readReg ; Read register, assuming non-offset reg address is in W already
+000F   3E70           00026     addlw   R0  ; offset to actual register locations
+0010   0084           00027     movwf   FSR ; indirect addressing
+0011   0800           00028     movf    INDF,W;
+0012   0008           00029     return
+                      00030 
+0013                  00031 writeReg ; Write to register, assuming non-offset reg address is in W already
+0013   3E70           00032     addlw   R0 ; and value to write is in writeVal
+0014   0084           00033     movwf   FSR
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0015   0823           00034     movf    writeVal,W;
+0016   0080           00035     movwf   INDF
+0017   0008           00036     return;
+                      00037 
+0018                  00038 writeStatus ; sets R15, the Status register [- - Z C]
+0018   01FF           00039     clrf    R15
+0019   1A85           00040     btfsc   PORTA,ZZ ;get status from PORTA
+001A   14FF           00041         bsf   R15,1  ; set Z bit
+001B   1B05           00042     btfsc   PORTA,CC
+001C   147F           00043         bsf   R15,0  ; set C bit
+001D   0008           00044     return
+                      00045 
+001E                  00046 readInstr ; Read Instruction from EEPROM
+001E   1703           00047     bsf     STATUS,RP1;
+001F   1283           00048     bcf     STATUS,RP0; Go to BANK2
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0020   0820           00049     movf    PC,W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0021   0AA0           00050     incf    PC,F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0022   008D           00051     movwf   EEADR ; set EEPROM address to read from
+0023   1683           00052     bsf     STATUS,RP0; EECON1 is in BANK3
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0024   140C           00053     bsf     EECON1,RD ; Data ready now.
+0025   1283           00054     bcf     STATUS, RP0 ; BANK2
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0026   080C           00055     movf        EEDATA, W;
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0027   00A1           00056     movwf   INSTR1;
+                      00057 
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0028   0820           00058     movf    PC,W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0029   0AA0           00059     incf    PC,F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+002A   008D           00060     movwf   EEADR ; set EEPROM address to read from
+002B   1683           00061     bsf     STATUS,RP0; EECON1 is in BANK3
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+002C   138C           00062     bcf     EECON1,EEPGD ; ready to read from EEPROM
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+002D   140C           00063     bsf     EECON1,RD ; Data ready now.
+002E   1283           00064     bcf     STATUS, RP0 ; BANK2
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+002F   080C           00065     movf        EEDATA, W;
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0030   00A2           00066     movwf   INSTR2;
+0031   0008           00067     RETURN
+                      00068 
+0032                  00069 execInstr ; Execute Instruction
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0032   0821           00070     movf    INSTR1,W
+0033   39F0           00071     andlw   0xF0    ; extract upper 4 bits
+                      00072 
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0034   3A00           00073     xorlw   NOP2    ; xoring will make W=0 and Z=1 if they match
+0035   1903           00074     btfsc   STATUS,Z
+0036   2???           00075     goto    inop2
+0037   3A10           00076     xorlw   ADD^NOP2 ; :::::: ADD
+0038   1903           00077     btfsc   STATUS,Z
+0039   2???           00078     goto    iadd
+                      00079 
+003A   3A30           00080     xorlw   SUB^ADD  ; :::::: SUB
+003B   1903           00081     btfsc   STATUS,Z
+003C   2???           00082     goto    isub
+                      00083 
+003D   3A10           00084     xorlw   AND^SUB  ; :::::: AND
+003E   1903           00085     btfsc   STATUS,Z
+003F   2???           00086     goto    iand
+                      00087 
+0040   3A70           00088     xorlw   IOR^AND  ; :::::: OR
+0041   1903           00089     btfsc   STATUS,Z
+0042   2???           00090     goto    ior
+                      00091 
+0043   3A10           00092     xorlw   XOR^IOR  ; :::::: XOR
+0044   1903           00093     btfsc   STATUS,Z
+0045   2???           00094     goto    ixor
+                      00095 
+0046   3A30           00096     xorlw   RRL^XOR  ; :::::: RRL/R
+0047   1903           00097     btfsc   STATUS,Z
+0048   2???           00098     goto    irr
+                      00099 
+0049   3A10           00100     xorlw   NOT^RRL  ; :::::: NOT
+004A   1903           00101     btfsc   STATUS,Z
+                      00102 ;    goto    inot
+                      00103 
+004B   3AF0           00104     xorlw   MOV^NOT  ; :::::: MOV
+004C   1903           00105     btfsc   STATUS,Z
+                      00106 ;    goto    imov
+                      00107 
+004D                  00108 inop2 ; NOP instruction
+004D   2???           00109     goto start
+                      00110 
+004E                  00111 iadd ; ADD instruction
+                      00112 
+                      00113 ; Write Rc to PORTB<7:4>
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+004E   0822           00114     movf    INSTR2,W
+004F   390F           00115     andlw   0x0F ;
+0050   2???           00116     call    readReg ; get Rc
+0051   1283 1303      00117     banksel PORTB
+0053   0086           00118     movwf   PORTB
+0054   0E86           00119     swapf   PORTB,F ; PORTB = cccc0000
+                      00120 
+                      00121 ; Write Rb to PORTB<3:0>
+0055   1283 1703      00122     banksel INSTR2
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0057   0EA2           00123     swapf   INSTR2,F
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0058   0822           00124     movf    INSTR2,W
+0059   390F           00125     andlw   0x0F
+005A   2???           00126     call    readReg ; get Rb
+005B   1283 1303      00127     banksel PORTB
+005D   0486           00128     iorwf   PORTB,F ; PORTB = ccccbbbb
+                      00129 
+                      00130 ; Get result from ALU
+005E   3010           00131     movlw   ADD
+005F   0087           00132     movwf   PORTC ; ALU Add
+0060   0805           00133     movf    PORTA,W
+                      00134 ; Write Z,C
+0061   2???           00135     call    writeStatus
+                      00136 
+                      00137 ; Write to Ra
+0062   1283 1703      00138     banksel INSTR1
+0064   390F           00139     andlw   0x0F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0065   00A3           00140     movwf   writeVal
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0066   0821           00141     movf    INSTR1,W
+0067   390F           00142     andlw   0x0F ; 
+                      00143 
+0068   2???           00144     call    writeReg ; Ra = Rb + Rc
+                      00145     
+0069   2???           00146     goto start
+                      00147 
+006A                  00148 isub ; SUB instruction
+                      00149  ; Write Rc to PORTB<7:4>
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+006A   0822           00150     movf    INSTR2,W
+006B   390F           00151     andlw   0x0F ;
+006C   2???           00152     call    readReg ; get Rc
+006D   1283 1303      00153     banksel PORTB
+006F   0086           00154     movwf   PORTB
+0070   0E86           00155     swapf   PORTB,F ; PORTB = cccc0000
+                      00156 
+                      00157 ; Write Rb to PORTB<3:0>
+0071   1283 1703      00158     banksel INSTR2
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0073   0E22           00159     swapf   INSTR2,W
+0074   390F           00160     andlw   0x0F
+0075   2???           00161     call    readReg ; get Rb
+0076   1283 1303      00162     banksel PORTB
+0078   0486           00163     iorwf   PORTB,F ; PORTB = ccccbbbb
+                      00164 
+                      00165 ; Get result from ALU
+0079   3020           00166     movlw   SUB
+007A   0087           00167     movwf   PORTC ; ALU Add
+007B   0805           00168     movf    PORTA,W
+                      00169 ; Write Z,C
+007C   2???           00170     call    writeStatus
+                      00171 
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00172 ; Write to Ra
+007D   1283 1703      00173     banksel INSTR1
+007F   390F           00174     andlw   0x0F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0080   00A3           00175     movwf   writeVal
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0081   0821           00176     movf    INSTR1,W
+0082   390F           00177     andlw   0x0F ;
+                      00178 
+0083   2???           00179     call    writeReg ; Ra = Rb + Rc
+                      00180 
+0084   2???           00181     goto start
+                      00182 
+0085                  00183 iand ; AND instruction
+                      00184  ; Write Rc to PORTB<7:4>
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0085   0822           00185     movf    INSTR2,W
+0086   390F           00186     andlw   0x0F ;
+0087   2???           00187     call    readReg ; get Rc
+0088   1283 1303      00188     banksel PORTB
+008A   0086           00189     movwf   PORTB
+008B   0E86           00190     swapf   PORTB,F ; PORTB = cccc0000
+                      00191 
+                      00192 ; Write Rb to PORTB<3:0>
+008C   1283 1703      00193     banksel INSTR2
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+008E   0EA2           00194     swapf   INSTR2,F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+008F   0822           00195     movf    INSTR2,W
+0090   390F           00196     andlw   0x0F
+0091   2???           00197     call    readReg ; get Rb
+0092   1283 1303      00198     banksel PORTB
+0094   0486           00199     iorwf   PORTB,F ; PORTB = ccccbbbb
+                      00200 
+                      00201 ; Get result from ALU
+0095   3030           00202     movlw   AND
+0096   0087           00203     movwf   PORTC ; ALU Add
+0097   0805           00204     movf    PORTA,W
+                      00205 ; Write Z,C
+0098   2???           00206     call    writeStatus
+                      00207 
+                      00208 ; Write to Ra
+0099   1283 1703      00209     banksel INSTR1
+009B   390F           00210     andlw   0x0F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+009C   00A3           00211     movwf   writeVal
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+009D   0821           00212     movf    INSTR1,W
+009E   390F           00213     andlw   0x0F ;
+                      00214 
+009F   2???           00215     call    writeReg ; Ra = Rb + Rc
+                      00216 
+00A0   2???           00217     goto start
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00218 
+00A1                  00219 ior ; OR instruction
+                      00220  ; Write Rc to PORTB<7:4>
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00A1   0822           00221     movf    INSTR2,W
+00A2   390F           00222     andlw   0x0F ;
+00A3   2???           00223     call    readReg ; get Rc
+00A4   1283 1303      00224     banksel PORTB
+00A6   0086           00225     movwf   PORTB
+00A7   0E86           00226     swapf   PORTB,F ; PORTB = cccc0000
+                      00227 
+                      00228 ; Write Rb to PORTB<3:0>
+00A8   1283 1703      00229     banksel INSTR2
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00AA   0EA2           00230     swapf   INSTR2,F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00AB   0822           00231     movf    INSTR2,W
+00AC   390F           00232     andlw   0x0F
+00AD   2???           00233     call    readReg ; get Rb
+00AE   1283 1303      00234     banksel PORTB
+00B0   0486           00235     iorwf   PORTB,F ; PORTB = ccccbbbb
+                      00236 
+                      00237 ; Get result from ALU
+00B1   3040           00238     movlw   IOR
+00B2   0087           00239     movwf   PORTC ; ALU Add
+00B3   0805           00240     movf    PORTA,W
+                      00241 ; Write Z,C
+00B4   2???           00242     call    writeStatus
+                      00243 
+                      00244 ; Write to Ra
+00B5   1283 1703      00245     banksel INSTR1
+00B7   390F           00246     andlw   0x0F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00B8   00A3           00247     movwf   writeVal
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00B9   0821           00248     movf    INSTR1,W
+00BA   390F           00249     andlw   0x0F ;
+                      00250 
+00BB   2???           00251     call    writeReg ; Ra = Rb + Rc
+                      00252 
+00BC   2???           00253     goto start
+                      00254 
+00BD                  00255 ixor ; XOR instruction
+                      00256  ; Write Rc to PORTB<7:4>
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00BD   0822           00257     movf    INSTR2,W
+00BE   390F           00258     andlw   0x0F ;
+00BF   2???           00259     call    readReg ; get Rc
+00C0   1283 1303      00260     banksel PORTB
+00C2   0086           00261     movwf   PORTB
+00C3   0E86           00262     swapf   PORTB,F ; PORTB = cccc0000
+                      00263 
+                      00264 ; Write Rb to PORTB<3:0>
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00C4   1283 1703      00265     banksel INSTR2
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00C6   0EA2           00266     swapf   INSTR2,F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00C7   0822           00267     movf    INSTR2,W
+00C8   390F           00268     andlw   0x0F
+00C9   2???           00269     call    readReg ; get Rb
+00CA   1283 1303      00270     banksel PORTB
+00CC   0486           00271     iorwf   PORTB,F ; PORTB = ccccbbbb
+                      00272 
+                      00273 ; Get result from ALU
+00CD   3050           00274     movlw   XOR
+00CE   0087           00275     movwf   PORTC ; ALU Add
+00CF   0805           00276     movf    PORTA,W
+                      00277 ; Write Z,C
+00D0   2???           00278     call    writeStatus
+                      00279 
+                      00280 ; Write to Ra
+00D1   1283 1703      00281     banksel INSTR1
+00D3   390F           00282     andlw   0x0F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00D4   00A3           00283     movwf   writeVal
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00D5   0821           00284     movf    INSTR1,W
+00D6   390F           00285     andlw   0x0F ;
+                      00286 
+00D7   2???           00287     call    writeReg ; Ra = Rb + Rc
+                      00288 
+00D8   2???           00289     goto start
+                      00290 
+00D9                  00291 irr ; SHIFT Left instruction
+                      00292  ; Write Rc to PORTB<7:4>
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00D9   0822           00293     movf    INSTR2,W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00DA   1FA2           00294     btfss   INSTR2,0x7
+                      00295         
+00DB   390F           00296     andlw   0x0F ;
+00DC   2???           00297     call    readReg ; get Rc
+00DD   1283 1303      00298     banksel PORTB
+00DF   0086           00299     movwf   PORTB
+00E0   0E86           00300     swapf   PORTB,F ; PORTB = cccc0000
+                      00301 
+                      00302 ; Write Rb to PORTB<3:0>
+00E1   1283 1703      00303     banksel INSTR2
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00E3   0822           00304     movf    INSTR2,W
+00E4   390F           00305     andlw   0x0F
+00E5   2???           00306     call    readReg ; get Rb
+00E6   1283 1303      00307     banksel PORTB
+00E8   0486           00308     iorwf   PORTB,F ; PORTB = ccccbbbb
+                      00309 
+                      00310 ; Get result from ALU
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00E9   3050           00311     movlw   XOR
+00EA   0087           00312     movwf   PORTC ; ALU Add
+00EB   0805           00313     movf    PORTA,W
+                      00314 ; Write Z,C
+00EC   2???           00315     call    writeStatus
+                      00316 
+                      00317 ; Write to Ra
+00ED   1283 1703      00318     banksel INSTR1
+00EF   390F           00319     andlw   0x0F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00F0   00A3           00320     movwf   writeVal
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00F1   0821           00321     movf    INSTR1,W
+00F2   390F           00322     andlw   0x0F ;
+                      00323 
+00F3   2???           00324     call    writeReg ; Ra = Rb + Rc
+                      00325 
+00F4   2???           00326     goto start
+                      00327 
+                      00328 
+00F5                  00329 start
+00F5   2???           00330     call    readInstr;
+00F6   2???           00331     goto    execInstr;
+00F7   2???           00332     goto    start
+3F72                  00333     end
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE 10
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ACKDT                             00000005
+ACKEN                             00000004
+ACKSTAT                           00000006
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADCS2                             00000006
+ADD                               00000010
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+AND                               00000030
+BCLIE                             00000003
+BCLIF                             00000003
+BF                                00000000
+BRGH                              00000002
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CC                                00000006
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2                             0000001B
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CHS0                              00000003
+CHS1                              00000004
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE 11
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CHS2                              00000005
+CIS                               00000003
+CKE                               00000006
+CKP                               00000004
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000009C
+CMIE                              00000006
+CMIF                              00000006
+CREN                              00000004
+CSRC                              00000007
+CVR0                              00000000
+CVR1                              00000001
+CVR2                              00000002
+CVR3                              00000003
+CVRCON                            0000009D
+CVREN                             00000007
+CVROE                             00000006
+CVRR                              00000005
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+D_A                               00000005
+D_NOT_A                           00000005
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+GCEN                              00000007
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+GO_NOT_DONE                       00000002
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+IBF                               00000007
+IBOV                              00000005
+INDF                              00000000
+INSTR1                            00000121
+INSTR2                            00000122
+INTCON                            0000000B
+INTE                              00000004
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE 12
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+INTEDG                            00000006
+INTF                              00000001
+IOR                               00000040
+IRP                               00000007
+JMP                               000000C0
+JSR                               000000D0
+LOD                               00000090
+MOV                               00000080
+NOP2                              00000000
+NOT                               00000070
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OBF                               00000006
+OERR                              00000001
+OPTION_REG                        00000081
+P                                 00000004
+PC                                00000120
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCFG3                             00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PEN                               00000002
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PORTD                             00000008
+PORTE                             00000009
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+PSPIE                             00000007
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE 13
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+PSPIF                             00000007
+PSPMODE                           00000004
+R                                 00000002
+R0                                00000070
+R1                                00000071
+R10                               0000007A
+R11                               0000007B
+R12                               0000007C
+R13                               0000007D
+R14                               0000007E
+R15                               0000007F
+R2                                00000072
+R3                                00000073
+R4                                00000074
+R5                                00000075
+R6                                00000076
+R7                                00000077
+R8                                00000078
+R9                                00000079
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCEN                              00000003
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RD0                               00000000
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+RE0                               00000000
+RE1                               00000001
+RE2                               00000002
+READ_WRITE                        00000002
+RET                               000000E0
+RP0                               00000005
+RP1                               00000006
+RRL                               00000060
+RRR                               00000060
+RSEN                              00000001
+RX9                               00000006
+RX9D                              00000000
+R_NOT_W                           00000002
+R_W                               00000002
+Rc                                00000124
+S                                 00000003
+SEN                               00000000
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPCON2                           00000091
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+STO                               000000A0
+SUB                               00000020
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+T1OSCEN                           00000003
+T1SYNC                            00000002
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC                             00000087
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD                             00000088
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE                             00000089
+TRISE0                            00000000
+TRISE1                            00000001
+TRISE2                            00000002
+TRMT                              00000001
+TSC                               000000B0
+TSS                               000000B0
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+W                                 00000000
+WCOL                              00000007
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+XOR                               00000050
+Z                                 00000002
+ZZ                                00000005
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00001FFF
+_CP_OFF                           00003FFF
+_CP_ON                            00001FFF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_LVP_OFF                          00003F7F
+MPASM 5.55  /USERS/ELIFRIEDMAN/DOCUMENTS/SCH   5-14-2014  0:32:41         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_LVP_ON                           00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_WRT_1FOURTH                      00003BFF
+_WRT_256                          00003DFF
+_WRT_HALF                         000039FF
+_WRT_OFF                          00003FFF
+_XT_OSC                           00003FFD
+__16F877A                         00000001
+__DEBUG                           
+execInstr                         00000032
+iadd                              0000004E
+iand                              00000085
+inop2                             0000004D
+ior                               000000A1
+irr                               000000D9
+isub                              0000006A
+ixor                              000000BD
+readInstr                         0000001E
+readReg                           0000000F
+start                             000000F5
+writeReg                          00000013
+writeStatus                       00000018
+writeVal                          00000123
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :    50 reported,     0 suppressed
+
+
