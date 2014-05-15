@@ -1,11 +1,11 @@
 MPLINK 5.01, LINKER
-Linker Map File - Created Thu May 15 03:58:08 2014
+Linker Map File - Created Thu May 15 12:32:54 2014
 
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
                 ---------  ---------  ---------  ---------  ---------
-                   .org_0       code   0x000000    program   0x0000b6
-                   .cinit    romdata   0x00005b    program   0x000004
+                   .org_0       code   0x000000    program   0x000120
+                   .cinit    romdata   0x000090    program   0x000004
 .config_2007_BUILD/DEFAULT/DEBUG/EEPROM.O       code   0x002007    program   0x000002
 
 
@@ -13,38 +13,64 @@ Linker Map File - Created Thu May 15 03:58:08 2014
                               Program Memory Usage 
                                Start         End      
                            ---------   ---------      
-                            0x000000    0x00005c      
+                            0x000000    0x000091      
                             0x002007    0x002007      
-            94 out of 8454 program addresses used, program memory utilization is 1%
+            147 out of 8454 program addresses used, program memory utilization is 1%
 
 
 
                               Symbols - Sorted by Name
                      Name    Address   Location    Storage File                     
                 ---------  ---------  ---------  --------- ---------                
-                execInstr   0x00002c    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                     iALU   0x000039    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                  iRotate   0x000038    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                readInstr   0x00001e    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                  readReg   0x00000f    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                    start   0x000058    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                 writeReg   0x000013    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-              writeStatus   0x000018    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                 zcomands   0x000030    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                execInstr   0x00002c    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iALU   0x000054    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iJMP   0x000087    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                    iJMPk   0x00008a    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iJSR   0x00008b    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iLOD   0x00007d    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                    iLODk   0x000080    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iMOV   0x000073    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                    iMOVk   0x000076    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iRET   0x00008c    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iRRL   0x000053    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                  iRotate   0x000050    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iSTO   0x000081    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                    iSTOk   0x000084    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iTSC   0x000085    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iTSS   0x000086    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                readInstr   0x00001e    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                  readReg   0x00000f    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                    start   0x00008d    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                 writeReg   0x000013    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+              writeStatus   0x000018    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                 zcomands   0x000048    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
 
 
 
                               Symbols - Sorted by Address
                      Name    Address   Location    Storage File                     
                 ---------  ---------  ---------  --------- ---------                
-                  readReg   0x00000f    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                 writeReg   0x000013    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-              writeStatus   0x000018    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                readInstr   0x00001e    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                execInstr   0x00002c    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                 zcomands   0x000030    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                  iRotate   0x000038    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                     iALU   0x000039    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
-                    start   0x000058    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                  readReg   0x00000f    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                 writeReg   0x000013    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+              writeStatus   0x000018    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                readInstr   0x00001e    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                execInstr   0x00002c    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                 zcomands   0x000048    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                  iRotate   0x000050    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iRRL   0x000053    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iALU   0x000054    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iMOV   0x000073    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                    iMOVk   0x000076    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iLOD   0x00007d    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                    iLODk   0x000080    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iSTO   0x000081    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                    iSTOk   0x000084    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iTSC   0x000085    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iTSS   0x000086    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iJMP   0x000087    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                    iJMPk   0x00008a    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iJSR   0x00008b    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                     iRET   0x00008c    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
+                    start   0x00008d    program     static D:\Dropbox\Jreports\005 Cooper Union\003 Sophmore\102 Spring 2014\Comp Ark\Final\Code\CPU-master\CPU-master\EEPROM.asm
 
 

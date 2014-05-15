@@ -6,6 +6,12 @@ INSTR2 equ 0x122 ; Memory location of LSB of instruction (Bank2)
 writeVal    equ 0x123
 ALUcmd     equ 0x124
 
+t0  equ 0x130
+t1  equ 0x131
+t2  equ 0x132
+t3  equ 0x133
+t4  equ 0x134
+
 ;---- Constants -----------------------------------------------------
 ZZ equ H'5'
 CC equ H'6'
@@ -17,11 +23,12 @@ SUB equ B'00100000' ; 0010 aaaa bbbb cccc    Z,C     Ra = Rb ­ Rc
 AND equ B'00110000' ; 0011 aaaa bbbb cccc    Z,C     Ra = Rb & Rc
 IOR equ B'01000000' ; 0100 aaaa bbbb cccc    Z,C     Ra = Rb | Rc
 XOR equ B'01010000' ; 0101 aaaa bbbb cccc    Z,C     Ra = Rb ^ Rc
-NOT equ B'01110000' ; 0111 aaaa xxxx bbbb    Z       Ra = ~Rb
-
 
 RRL equ B'01100000' ; 0110 aaaa 0xxx bbbb    C       Ra = Rb rotated left by 1 thru C
 RRR equ B'01100000' ; 0110 aaaa 1xxx bbbb    C       Ra = Rb rotated right by 1 thru C
+
+NOT equ B'01110000' ; 0111 aaaa xxxx bbbb    Z       Ra = ~Rb
+
 
 MOV equ B'10000000' ; 1000 aaaa 1xxx bbbb    Z       Ra = Rb
 MOV equ B'10000000' ; 1000 aaaa 0xxx kkkk    Z       Ra = k

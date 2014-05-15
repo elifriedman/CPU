@@ -8,7 +8,7 @@
     ORG 0x00
     banksel EECON1 ; read from EEPROM instead of Flash
     bcf     EECON1,EEPGD
-    banksel EEADR  ; Make sure Program Counter is set to 0
+    banksel EEADR  ; Make sure Kirt_Program Counter is set to 0
     clrf    EEADR
     banksel ADCON1 ; set PORTA as input
     movlw   0x06
@@ -68,7 +68,40 @@ execInstr ; Execute Instruction
     btfss INSTR1, 7; test MSb if set skip zcommands
     goto zcomands
 
-    ;;now test the one_commands
+    ;;now test which of the other commands
+    xorlw MOV ; xoring will make W=0 and Z=1 if they match
+    btfsc STATUS,Z
+    goto iMOV
+
+    xorlw LOD^MOV ; :::::: LOD
+    btfsc STATUS,Z
+    goto iLOD
+
+    xorlw STO^LOD ; :::::: STO
+    btfsc STATUS,Z
+    goto iSTO
+
+    xorlw TSC^STO 
+    btfsc STATUS,Z
+    goto iTSC
+
+    xorlw TSS^TSC
+    btfsc STATUS,Z
+    goto iTSS
+
+    xorlw JMP^TSS
+    btfsc STATUS,Z
+    goto iJMP
+
+    xorlw JSR^JMP
+    btfsc STATUS,Z
+    goto iJSR
+
+    xorlw RET^JSR
+    btfsc STATUS,Z
+    goto iRET
+
+
 
 zcomands ;testing if it's the nop command or if it's rot or ALU
     ;;the kirtcommands are in w
@@ -87,7 +120,14 @@ zcomands ;testing if it's the nop command or if it's rot or ALU
 
 iRotate
     ;;do rotating commands in ALU;
+    btfss INSTR2, 7 ; check which Rotate it is.
+    goto iRRL; it's left
+    ;else // it's RRR
 
+    goto start;
+iRRL
+
+    
     goto start;
 
 iALU ; ALU instruction
@@ -129,6 +169,70 @@ iALU ; ALU instruction
     
     goto start
 
+;;Make functions -iMOV - RET
+iMOV
+    btfss INSTR2, 7 ; check which iMOV it is. 
+    goto iMOVk; it's k-type
+   
+    ;;MOV non-k
+    movf  INSTR2, W
+    andlw 0x0F; extract bbbb
+    call readReg; *B is in W
+    movwf  writeVal; writeVal = *B;
+    movf INSTR1, W
+    andlw 0x0F; extract aaaa
+    call writeReg    
+    goto start
+
+iMOVk
+    movf  INSTR2, W
+    andlw 0x0F; extract kkkk
+    movwf  writeVal; writeVal = 0000kkkk;
+    movf INSTR1, W
+    andlw 0x0F; extra aaaa
+    call writeReg    
+    goto start
+
+iLOD
+
+    btfss INSTR2, 7 ; check which iLOD it is.
+    goto iLODk; it's k-type
+
+    goto start
+
+iLODk
+
+    goto start
+iSTO
+
+    btfss INSTR2, 7 ; check which iSTO it is.
+    goto iSTOk; it's k-type
+
+    goto start
+
+iSTOk
+    goto start
+iTSC
+
+    goto start
+iTSS
+
+    goto start
+iJMP
+    btfss INSTR1, 4 ; check which iJMP it is.
+    goto iJMPk; it's k-type
+
+    goto start
+
+iJMPk
+
+    goto start
+iJSR
+
+    goto start
+iRET
+
+    goto start
 
 start
     call    readInstr
