@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=Computer
+PROJECTNAME=CPU-master
 
 # Active Configuration
 DEFAULTCONF=default

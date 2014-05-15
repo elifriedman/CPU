@@ -6,8 +6,10 @@
 
 
     ORG 0x00
-    banksel PC
-    clrf    PC
+    banksel EECON1 ; read from EEPROM instead of Flash
+    bcf     EECON1,EEPGD
+    banksel EEADR  ; Make sure Program Counter is set to 0
+    clrf    EEADR
     banksel ADCON1 ; set PORTA as input
     movlw   0x06
     movwf   ADCON1
@@ -42,27 +44,22 @@ writeStatus ; sets R15, the Status register [- - Z C]
     return
 
 readInstr ; Read Instruction from EEPROM
-    bsf     STATUS,RP1;
-    bcf     STATUS,RP0; Go to BANK2
-    movf    PC,W
-    incf    PC,F
-    movwf   EEADR ; set EEPROM address to read from
-    bsf     STATUS,RP0; EECON1 is in BANK3
-    bcf     EECON1,EEPGD ; ready to read from EEPROM
+
+    ; Read from current EEADR
+    banksel EECON1
     bsf     EECON1,RD ; Data ready now.
     bcf     STATUS, RP0 ; BANK2
     movf	EEDATA, W;
     movwf   INSTR1;
 
-    movf    PC,W
-    incf    PC,F
-    movwf   EEADR ; set EEPROM address to read from
-    bsf     STATUS,RP0; EECON1 is in BANK3
-    bcf     EECON1,EEPGD ; ready to read from EEPROM
+    ; Read from next EEADR
+    incf    EEADR,F
+    bsf     STATUS, RP0 ; BANK3
     bsf     EECON1,RD ; Data ready now.
     bcf     STATUS, RP0 ; BANK2
     movf	EEDATA, W;
     movwf   INSTR2;
+    incf    EEADR,F
     RETURN
 
 execInstr ; Execute Instruction

@@ -13,7 +13,7 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>EEPROM.asm</itemPath>
-      <itemPath>../../../Documents/School/Sophomore/CompArch/Computer/constants.inc</itemPath>
+      <itemPath>constants.inc</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
