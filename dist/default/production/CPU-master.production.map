@@ -1,0 +1,50 @@
+MPLINK 5.01, LINKER
+Linker Map File - Created Thu May 15 03:48:59 2014
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x0000b4
+                   .cinit    romdata   0x00005a    program   0x000004
+.config_2007_BUILD/DEFAULT/PRODUCTION/EEPROM.       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x00005b      
+                            0x002007    0x002007      
+            93 out of 8454 program addresses used, program memory utilization is 1%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                execInstr   0x00002b    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                     iALU   0x000038    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                  iRotate   0x000037    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                readInstr   0x00001e    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                  readReg   0x00000f    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                    start   0x000057    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                 writeReg   0x000013    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+              writeStatus   0x000018    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                 zcomands   0x00002f    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                  readReg   0x00000f    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                 writeReg   0x000013    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+              writeStatus   0x000018    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                readInstr   0x00001e    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                execInstr   0x00002b    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                 zcomands   0x00002f    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                  iRotate   0x000037    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                     iALU   0x000038    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+                    start   0x000057    program     static /Users/EliFriedman/Dropbox/CPU-master/EEPROM.asm
+
+
