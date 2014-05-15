@@ -7,10 +7,12 @@ writeVal   equ 0x112
 ALUcmd     equ 0x113
 sPtr       equ 0x114
 
-t0  equ 0x115
+t0  equ 0x115 ; temporary registers
 t1  equ 0x116
 t2  equ 0x117
 t3  equ 0x118
+t4  equ 0x119
+
 
 ;---- Constants -----------------------------------------------------
 ZZ equ H'5'
@@ -65,3 +67,6 @@ R12 equ 0x7C
 R13 equ 0x7D
 R14 equ 0x7E ; BANK SELECT register
 R15 equ 0x7F ; STATUS register [- - Z C] (bank0)
+
+;----- RAM -----------------------------------------------------
+RAM equ 0xA0 ; Start address of KirtRAM
