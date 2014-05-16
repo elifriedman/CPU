@@ -1,3 +1,5 @@
+### Eli Friedman
+
 AND='000'
 OR='001'
 XOR='010'
@@ -61,19 +63,3 @@ testGen(ADD);
 
 
 f.close();
-f2=open("PLDExpression.txt",mode='w');
-def genLogic(op):
-    for A in range(0x10):
-        for B in range(0x10):
-            for cin in range(2):
-                a = bin(A)[2:]; b = bin(B)[2:];
-                a=a.rjust(4,'0'); b=b.rjust(4,'0'); #add 0 padding
-                out,cout=operation(op,A,B,cin);
-                out=bin(out)[2:].rjust(4,'0');
-                print("'b'",op,a,b,cin," => 'b'",out,cout,";",sep='',file=f2);
-
-
-f2.close();
-
-                
-

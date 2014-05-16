@@ -8,6 +8,7 @@ Assembly  None;
 Location  None;
 Device    g22V10;
 
+
 /****************************************************************/
 /*                                                              */
 /****************************************************************/
@@ -25,28 +26,30 @@ PIN 14 = oe;
 /**  Outputs  **/
 PIN 15 = Z;
 PIN 17 = cout;
-PIN [18..21] = Y3..0;
 
+PIN [19..21] = Y3..1;
+PIN 18 = Y0;
 
 
 MIN Y1..3 = 4;
 /** Declarations and Intermediate Variable Declaration **/
-AND = !M2 & M1 & MO;
-OR = M2 & !M1 & !M0;
-XOR = M2 & !M1 & M0;
-SHCL = M2 & M1 & !M0;
-SHCR = !M2 & !M1 & !M0;
-NOT = M2 & M1 & M0;
-SUB = !M2 & M1 & !M0;
-ADD = !M2 & !M1 & M0;
+AND = !M2 & !M1 & !M0;
+OR = !M2 & !M1 & M0;
+XOR = !M2 & M1 & !M0;
+SHCL = !M2 & M1 & M0;
+SHCR = M2 & !M1 & !M0;
+NOT = M2 & !M1 & M0;
+SUB = M2 & M1 & !M0;
+ADD = M2 & M1 & M0;
 
 PIN 16 = C1;
 PIN 23 = C0;
 PIN 22 = C2;
 /** Logic Equations **/
-[C0,C1,C2].oe = b'0';
-Z = !(Y3 # Y2 # Y1 # Y0);
 
+Z = !(Y3 # Y2 # Y1 # Y0);
+[Y0..3].oe = !oe;
+[cout,Z].oe = !oe;
 
 Y3 = 	(A3&B3) & AND #
 	(A3#B3) & OR #
@@ -84,7 +87,6 @@ Y0 = 	(A0&B0) & AND #
 	 A1 & SHCR #
 	 !A0 & NOT #
 	 (A0$B0$cin) & (ADD # SUB);
-
 
 C0 =   ((A0$B0)&cin # A0&B0)&ADD #
 	(!A0&(cin # B0) # B0&cin)&SUB;
